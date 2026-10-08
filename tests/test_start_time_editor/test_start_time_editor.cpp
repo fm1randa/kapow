@@ -8,6 +8,7 @@
 
 #include "start_time_editor.h"
 
+#include <QApplication>
 #include <QDateEdit>
 #include <QLabel>
 #include <QLineEdit>
@@ -21,6 +22,13 @@
 
 namespace
 {
+
+// Tell the application it lost or regained activation, as when the user switches to another application
+void setApplicationState(Qt::ApplicationState state)
+{
+	QApplicationStateChangeEvent event(state);
+	QCoreApplication::sendEvent(qApp, &event);
+}
 
 // Click the center of a widget the way a user does: through its window
 void clickThroughWindow(QWidget* widget)
@@ -200,6 +208,47 @@ void TestStartTimeEditor::clickingEditorKeepsEditing()
 
 	clickThroughWindow(editor->findChild<QTimeEdit*>());
 	clickThroughWindow(editor->findChild<QDateEdit*>());
+
+	QCOMPARE(cancelled.count(), 0);
+}
+
+//-----------------------------------------------------------------------------
+
+void TestStartTimeEditor::switchingApplicationCancels()
+{
+	QWidget window;
+	StartTimeEditor* editor = new StartTimeEditor(&window);
+	QVBoxLayout* layout = new QVBoxLayout(&window);
+	layout->addWidget(editor);
+	window.show();
+	QVERIFY(QTest::qWaitForWindowExposed(&window));
+
+	QSignalSpy accepted(editor, &StartTimeEditor::accepted);
+	QSignalSpy cancelled(editor, &StartTimeEditor::cancelled);
+
+	setApplicationState(Qt::ApplicationInactive);
+	setApplicationState(Qt::ApplicationActive);
+
+	QCOMPARE(accepted.count(), 0);
+	QCOMPARE(cancelled.count(), 1);
+}
+
+//-----------------------------------------------------------------------------
+
+void TestStartTimeEditor::hiddenEditorIgnoresSwitchingApplication()
+{
+	QWidget window;
+	StartTimeEditor* editor = new StartTimeEditor(&window);
+	QVBoxLayout* layout = new QVBoxLayout(&window);
+	layout->addWidget(editor);
+	window.show();
+	QVERIFY(QTest::qWaitForWindowExposed(&window));
+	editor->hide();
+
+	QSignalSpy cancelled(editor, &StartTimeEditor::cancelled);
+
+	setApplicationState(Qt::ApplicationInactive);
+	setApplicationState(Qt::ApplicationActive);
 
 	QCOMPARE(cancelled.count(), 0);
 }

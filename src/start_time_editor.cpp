@@ -30,7 +30,6 @@ StartTimeEditor::StartTimeEditor(QWidget* parent)
 	setFocusProxy(m_time);
 
 	connect(qApp, &QApplication::focusChanged, this, &StartTimeEditor::focusChanged);
-	qApp->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
@@ -66,6 +65,13 @@ bool StartTimeEditor::eventFilter(QObject* watched, QEvent* event)
 		}
 	}
 
+	// Switching to another application cancels; the application's own popups
+	// and message boxes keep it active
+	if ((watched == qApp) && (event->type() == QEvent::ApplicationStateChange)
+			&& (static_cast<QApplicationStateChangeEvent*>(event)->applicationState() != Qt::ApplicationActive)) {
+		Q_EMIT cancelled();
+	}
+
 	// Clicks reach the window before any widget, so each one is seen once here;
 	// this also catches clicks on widgets that take no focus
 	if ((event->type() == QEvent::MouseButtonPress) && isVisible() && watched->isWindowType()
@@ -78,6 +84,23 @@ bool StartTimeEditor::eventFilter(QObject* watched, QEvent* event)
 	}
 
 	return QWidget::eventFilter(watched, event);
+}
+
+//-----------------------------------------------------------------------------
+
+void StartTimeEditor::hideEvent(QHideEvent* event)
+{
+	qApp->removeEventFilter(this);
+	QWidget::hideEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+
+void StartTimeEditor::showEvent(QShowEvent* event)
+{
+	// Watch keys, clicks and application switches only while editing
+	qApp->installEventFilter(this);
+	QWidget::showEvent(event);
 }
 
 //-----------------------------------------------------------------------------

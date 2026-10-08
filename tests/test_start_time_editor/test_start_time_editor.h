@@ -21,6 +21,8 @@ private Q_SLOTS:
 	void focusMovingToAnotherWindowKeepsEditing();
 	void clickingElsewhereCancels();
 	void clickingEditorKeepsEditing();
+	void switchingApplicationCancels();
+	void hiddenEditorIgnoresSwitchingApplication();
 };
 
 #endif // KAPOW_TEST_START_TIME_EDITOR_H
