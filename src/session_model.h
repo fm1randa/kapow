@@ -40,15 +40,11 @@ public:
 
 	bool hasConflict(const QDateTime& current) const;
 
+	bool canMoveStart(const QDateTime& start, const QDateTime& new_start, const QDateTime& current) const;
+
 	Session session(int pos) const
 	{
 		return m_data.value(pos);
-	}
-
-	// End of the latest session; invalid when there are no sessions
-	QDateTime lastStop() const
-	{
-		return !m_data.isEmpty() ? QDateTime(m_data.last().date(), m_data.last().stop()) : QDateTime();
 	}
 
 	void beginLoad();

@@ -143,6 +143,51 @@ void TestProject::setStartTimeAtEndOfLastSession()
 
 //-----------------------------------------------------------------------------
 
+void TestProject::setStartTimeWithFutureSession()
+{
+	QTreeWidget tree;
+	Project* project = new Project(&tree, "Project");
+	QVERIFY(project->model()->add(QDateTime(QDate(2026, 10, 8), QTime(8, 0, 0)), QDateTime(QDate(2026, 10, 8), QTime(8, 30, 0)), QString()));
+	QVERIFY(project->model()->add(QDateTime(QDate(2026, 10, 9), QTime(10, 0, 0)), QDateTime(QDate(2026, 10, 9), QTime(11, 0, 0)), QString()));
+
+	QVERIFY(project->start(QDateTime(QDate(2026, 10, 8), QTime(9, 25, 0))));
+	const QDateTime now(QDate(2026, 10, 8), QTime(9, 30, 0));
+
+	// A session dated tomorrow does not block moving the start earlier
+	const QDateTime start(QDate(2026, 10, 8), QTime(9, 10, 0));
+	QVERIFY(project->setStartTime(start, now));
+	QCOMPARE(project->startTime(), start);
+
+	// The session before the timer still bounds it
+	QVERIFY(!project->setStartTime(QDateTime(QDate(2026, 10, 8), QTime(8, 29, 59)), now));
+	QCOMPARE(project->startTime(), start);
+	QVERIFY(project->setStartTime(QDateTime(QDate(2026, 10, 8), QTime(8, 30, 0)), now));
+}
+
+//-----------------------------------------------------------------------------
+
+void TestProject::setStartTimeBeforeNextSession()
+{
+	QTreeWidget tree;
+	Project* project = new Project(&tree, "Project");
+	QVERIFY(project->model()->add(QDateTime(QDate(2026, 10, 9), QTime(10, 0, 0)), QDateTime(QDate(2026, 10, 9), QTime(11, 0, 0)), QString()));
+
+	const QDateTime old_start(QDate(2026, 10, 8), QTime(9, 0, 0));
+	QVERIFY(project->start(old_start));
+	const QDateTime now(QDate(2026, 10, 9), QTime(12, 0, 0));
+
+	// The start may not move into or past the next session
+	QVERIFY(!project->setStartTime(QDateTime(QDate(2026, 10, 9), QTime(10, 30, 0)), now));
+	QVERIFY(!project->setStartTime(QDateTime(QDate(2026, 10, 9), QTime(10, 0, 0)), now));
+	QCOMPARE(project->startTime(), old_start);
+
+	const QDateTime start(QDate(2026, 10, 9), QTime(9, 59, 59));
+	QVERIFY(project->setStartTime(start, now));
+	QCOMPARE(project->startTime(), start);
+}
+
+//-----------------------------------------------------------------------------
+
 void TestProject::setStartTimeLater()
 {
 	QTreeWidget tree;

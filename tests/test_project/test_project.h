@@ -22,6 +22,8 @@ private Q_SLOTS:
 	void setStartTimeInFuture();
 	void setStartTimeBeforeLastSession();
 	void setStartTimeAtEndOfLastSession();
+	void setStartTimeWithFutureSession();
+	void setStartTimeBeforeNextSession();
 	void setStartTimeLater();
 	void setStartTimeAcrossMidnight();
 	void setStartTimeWithoutSessions();

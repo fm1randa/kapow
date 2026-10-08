@@ -153,12 +153,7 @@ bool Project::stop(QDateTime current)
 
 bool Project::setStartTime(const QDateTime& start, const QDateTime& current)
 {
-	// Only the running timer can move, never into the future nor before the last session
-	if (!m_active || (start > current)) {
-		return false;
-	}
-	const QDateTime last_stop = m_model->lastStop();
-	if (last_stop.isValid() && (start < last_stop)) {
+	if (!m_active || !m_model->canMoveStart(m_start_time, start, current)) {
 		return false;
 	}
 
