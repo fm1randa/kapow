@@ -12,6 +12,7 @@
 class Project;
 class SessionDelegate;
 class SessionModel;
+class StartTimeDialog;
 class StartTimeEditor;
 
 #include <QDateTime>
@@ -81,7 +82,7 @@ private Q_SLOTS:
 	void editSession();
 	void editStartTime();
 	void applyStartTimeEditor();
-	void closeStartTimeEditor();
+	void discardStartTimeEdit();
 	void removeSessions();
 	void moveSessions();
 	void toggleColumnHidden(int column);
@@ -99,6 +100,7 @@ private:
 	void removeProject(QTreeWidgetItem* item);
 	void minimizeToTray();
 	void restoreFromTray();
+	bool commitStartTime(Project* project, const QDateTime& start);
 	bool showRunningProject();
 	void updateColumnWidths();
 	void updateDetails();
@@ -125,6 +127,7 @@ private:
 	QLabel* m_start_line;
 	StartTimeEditor* m_start_editor;
 	QPointer<Project> m_start_editor_project;
+	QPointer<StartTimeDialog> m_start_dialog;
 	QLineEdit* m_task;
 	QPushButton* m_start;
 	QPushButton* m_stop;

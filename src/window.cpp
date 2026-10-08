@@ -89,7 +89,7 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 
 	m_start_editor = new StartTimeEditor(contents);
 	connect(m_start_editor, &StartTimeEditor::accepted, this, &Window::applyStartTimeEditor);
-	connect(m_start_editor, &StartTimeEditor::cancelled, this, &Window::closeStartTimeEditor);
+	connect(m_start_editor, &StartTimeEditor::cancelled, this, &Window::discardStartTimeEdit);
 	m_start_editor->hide();
 
 	m_current_time = QDateTime::currentDateTime();
@@ -467,7 +467,7 @@ bool Window::eventFilter(QObject* watched, QEvent* event)
 
 void Window::closeEvent(QCloseEvent* event)
 {
-	closeStartTimeEditor();
+	discardStartTimeEdit();
 
 	Settings settings;
 	settings.setValue("WindowGeometry", saveGeometry());
@@ -566,6 +566,7 @@ void Window::setDecimalTotals(bool decimals)
 void Window::setInlineEditing(bool edit)
 {
 	m_inline = edit;
+	discardStartTimeEdit();
 	if (!edit) {
 		m_details->closePersistentEditor(m_details->currentIndex());
 	}
@@ -625,6 +626,7 @@ void Window::start()
 
 void Window::stop()
 {
+	discardStartTimeEdit();
 	if (!m_active_project->stop(m_current_time)) {
 		QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
 	}
@@ -664,6 +666,7 @@ void Window::stopAll()
 		show();
 	}
 	if (QMessageBox::question(this, tr("Question"), tr("Stop all timers?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+		discardStartTimeEdit();
 		for (Project* project : std::as_const(m_active_timers)) {
 			project->stop(m_current_time);
 		}
@@ -692,6 +695,7 @@ void Window::stopAll()
 void Window::cancel()
 {
 	if (QMessageBox::question(this, tr("Question"), tr("Cancel this session?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+		discardStartTimeEdit();
 		m_active_project->stop();
 		m_active_timers.removeAll(m_active_project);
 		m_remove_project->setEnabled(true);
@@ -856,6 +860,8 @@ void Window::projectActivated(QTreeWidgetItem* item)
 		addProject(tr("Untitled"));
 		return;
 	}
+
+	discardStartTimeEdit();
 
 	if (m_active_model) {
 		disconnect(m_active_model, &SessionModel::billedStatusChanged, this, &Window::modelBilledStatusChanged);
@@ -1038,19 +1044,12 @@ void Window::editStartTime()
 
 	StartTimeDialog dialog(this);
 	dialog.setStartTime(project->startTime());
-	Q_FOREVER {
-		if (dialog.exec() != QDialog::Accepted) {
-			break;
-		}
+	m_start_dialog = &dialog;
 
-		// Judge "now" at the moment of confirming, and count from that same moment
-		m_current_time = QDateTime::currentDateTime();
-		if (project->setStartTime(dialog.startTime(), m_current_time)) {
-			updateDetails();
-			save();
+	// Stopping the timer meanwhile rejects the dialog, or ends the retries after a warning
+	while (project->startTime().isValid() && (dialog.exec() == QDialog::Accepted)) {
+		if (commitStartTime(project, dialog.startTime())) {
 			break;
-		} else {
-			QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
 		}
 	}
 }
@@ -1064,22 +1063,36 @@ void Window::applyStartTimeEditor()
 		return;
 	}
 
-	// Judge "now" at the moment of confirming, and count from that same moment
-	m_current_time = QDateTime::currentDateTime();
-	if (project->setStartTime(m_start_editor->startTime(), m_current_time)) {
-		closeStartTimeEditor();
-		updateDetails();
-		save();
-	} else {
-		// The warning is another window, so the editor stays open for a retry
-		QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
+	// The warning is another window, so the editor stays open for a retry
+	if (commitStartTime(project, m_start_editor->startTime())) {
+		discardStartTimeEdit();
 	}
 }
 
 //-----------------------------------------------------------------------------
 
-void Window::closeStartTimeEditor()
+bool Window::commitStartTime(Project* project, const QDateTime& start)
 {
+	// Judge "now" at the moment of confirming, and count from that same moment
+	m_current_time = QDateTime::currentDateTime();
+	if (!project->setStartTime(start, m_current_time)) {
+		QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
+		return false;
+	}
+
+	updateDetails();
+	save();
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::discardStartTimeEdit()
+{
+	// Close the start time dialog or the inline editor without applying it
+	if (m_start_dialog) {
+		m_start_dialog->reject();
+	}
 	if (!m_start_editor_project) {
 		return;
 	}
@@ -1620,12 +1633,6 @@ void Window::updateDisplay()
 		m_start_line->setText(tr("Running since %1, %2")
 				.arg(locale.toString(start.time(), QLocale::ShortFormat),
 					locale.toString(start.date(), QLocale::ShortFormat)));
-	}
-
-	// Discard an open start time editor once its timer stops or another project is selected
-	if (m_start_editor_project && ((m_start_editor_project != m_active_project) || !start.isValid())) {
-		m_start_editor_project = nullptr;
-		m_start_editor->hide();
 	}
 	m_start_line->setVisible(start.isValid() && !m_start_editor_project);
 }
