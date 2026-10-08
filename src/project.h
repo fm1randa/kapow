@@ -29,6 +29,12 @@ public:
 
 	bool isActive() const;
 
+	// Start time of this project's own running timer; invalid when it is not running
+	QDateTime startTime() const
+	{
+		return m_active ? m_start_time : QDateTime();
+	}
+
 	SessionModel* model() const
 	{
 		return m_model;
