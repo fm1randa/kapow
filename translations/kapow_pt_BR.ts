@@ -13,11 +13,11 @@
     </message>
     <message>
         <source>Note</source>
-        <translation>Nota</translation>
+        <translation>Aviso</translation>
     </message>
     <message>
         <source>Please restart this application for the change in language to take effect.</source>
-        <translation>Por favor, reinicie este aplicativo para que a alteração do idioma tenha efeito.</translation>
+        <translation>Reinicie o aplicativo para aplicar o novo idioma.</translation>
     </message>
 </context>
 <context>
@@ -60,23 +60,23 @@
     </message>
     <message>
         <source>Prepend currency symbol</source>
-        <translation>Preceder símbolo de moeda</translation>
+        <translation>Símbolo da moeda antes do valor</translation>
     </message>
     <message>
         <source>Hourly rate:</source>
-        <translation>Taxa de horas:</translation>
+        <translation>Valor por hora:</translation>
     </message>
     <message>
         <source>Tax rate:</source>
-        <translation>Taxa de imposto:</translation>
+        <translation>Alíquota de imposto:</translation>
     </message>
     <message>
         <source>Currency symbol:</source>
-        <translation>Símbolo de moeda:</translation>
+        <translation>Símbolo da moeda:</translation>
     </message>
     <message>
         <source>Contact Information</source>
-        <translation>Informação de contato</translation>
+        <translation>Informações de contato</translation>
     </message>
     <message>
         <source>Data</source>
@@ -84,7 +84,7 @@
     </message>
     <message>
         <source>Preview</source>
-        <translation>Pré-visualizar</translation>
+        <translation>Pré-visualização</translation>
     </message>
     <message>
         <source>Export</source>
@@ -96,7 +96,7 @@
     </message>
     <message>
         <source>Web Page (*.html *.htm)</source>
-        <translation>Página web (*.html, *htm)</translation>
+        <translation>Página web (*.html *.htm)</translation>
     </message>
     <message>
         <source>iCalendar (*.ics)</source>
@@ -116,7 +116,7 @@
     </message>
     <message>
         <source>Create Report</source>
-        <translation>Criar relatórios</translation>
+        <translation>Criar relatório</translation>
     </message>
     <message>
         <source>Phone: %1</source>
@@ -144,15 +144,15 @@
     </message>
     <message>
         <source>Remove</source>
-        <translation type="unfinished"></translation>
+        <translation>Remover</translation>
     </message>
     <message>
         <source>Question</source>
-        <translation>Pergunta</translation>
+        <translation>Confirmação</translation>
     </message>
     <message>
         <source>Remove newest report?</source>
-        <translation type="unfinished"></translation>
+        <translation>Remover o relatório mais recente?</translation>
     </message>
 </context>
 <context>
@@ -174,11 +174,11 @@
     <name>SessionDelegate</name>
     <message>
         <source>Error</source>
-        <translation type="unfinished">Erro</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <source>Session conflicts with other sessions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta sessão se sobrepõe a outras sessões.</translation>
     </message>
 </context>
 <context>
@@ -212,43 +212,43 @@
     <name>SessionModel</name>
     <message>
         <source>Total</source>
-        <translation type="unfinished">Total</translation>
+        <translation>Total</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation type="unfinished"></translation>
+        <translation>Data</translation>
     </message>
     <message>
         <source>Start</source>
-        <translation type="unfinished">Iniciar</translation>
+        <translation>Início</translation>
     </message>
     <message>
         <source>Stop</source>
-        <translation type="unfinished">Parar</translation>
+        <translation>Fim</translation>
     </message>
     <message>
         <source>Task</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarefa</translation>
     </message>
     <message>
         <source>Hours</source>
-        <translation type="unfinished">Horas</translation>
+        <translation>Horas</translation>
     </message>
     <message>
         <source>Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Diário</translation>
     </message>
     <message>
         <source>Weekly</source>
-        <translation type="unfinished"></translation>
+        <translation>Semanal</translation>
     </message>
     <message>
         <source>Monthly</source>
-        <translation type="unfinished"></translation>
+        <translation>Mensal</translation>
     </message>
     <message>
         <source>Report</source>
-        <translation type="unfinished"></translation>
+        <translation>Relatório</translation>
     </message>
 </context>
 <context>
@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>&amp;Minimize</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Minimizar</translation>
     </message>
     <message>
         <source>&amp;Project</source>
@@ -323,11 +323,11 @@
     </message>
     <message>
         <source>&amp;Decimal Totals</source>
-        <translation>Total de &amp;decinais</translation>
+        <translation>Totais em &amp;decimal</translation>
     </message>
     <message>
         <source>&amp;Inline Editing</source>
-        <translation>Edição em linha</translation>
+        <translation>&amp;Edição direta na tabela</translation>
     </message>
     <message>
         <source>Application &amp;Language...</source>
@@ -355,23 +355,23 @@
     </message>
     <message>
         <source>Show all</source>
-        <translation>Mostrar todos</translation>
+        <translation>Mostrar todas</translation>
     </message>
     <message>
         <source>Show only unbilled</source>
-        <translation>Mostrar somente não faturados</translation>
+        <translation>Mostrar só as não faturadas</translation>
     </message>
     <message>
         <source>Show only this year</source>
-        <translation>Mostrar somente este ano</translation>
+        <translation>Mostrar só este ano</translation>
     </message>
     <message>
         <source>Show only this month</source>
-        <translation>Mostrar somente este mês</translation>
+        <translation>Mostrar só este mês</translation>
     </message>
     <message>
         <source>Show only this week</source>
-        <translation>Mostrar somente esta semana</translation>
+        <translation>Mostrar só esta semana</translation>
     </message>
     <message>
         <source>Copyright &amp;copy; 2008-%1 Graeme Gott</source>
@@ -383,15 +383,15 @@
     </message>
     <message>
         <source>Session conflicts with other sessions.</source>
-        <translation type="unfinished"></translation>
+        <translation>Esta sessão se sobrepõe a outras sessões.</translation>
     </message>
     <message>
         <source>&amp;Restore</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Restaurar</translation>
     </message>
     <message>
         <source>Unable to read time data.</source>
-        <translation>Não foi possível ler dados do horário.</translation>
+        <translation>Não foi possível ler os dados de horas.</translation>
     </message>
     <message>
         <source>Untitled</source>
@@ -399,7 +399,7 @@
     </message>
     <message>
         <source>Unable to write time data.</source>
-        <translation>Não foi possível escrever dados do horário.</translation>
+        <translation>Não foi possível salvar os dados de horas.</translation>
     </message>
     <message>
         <source>There are timers running. Stop timers and quit?</source>
@@ -411,11 +411,11 @@
     </message>
     <message>
         <source>A program to help track spent time</source>
-        <translation>Um programa para ajudar a registrar o tempo despendido</translation>
+        <translation>Um programa para registrar o tempo trabalhado</translation>
     </message>
     <message>
         <source>Question</source>
-        <translation>Pergunta</translation>
+        <translation>Confirmação</translation>
     </message>
     <message>
         <source>&amp;Create Report...</source>
@@ -423,7 +423,7 @@
     </message>
     <message>
         <source>View R&amp;eports</source>
-        <translation>Ver R&amp;elatórios</translation>
+        <translation>Ver r&amp;elatórios</translation>
     </message>
     <message>
         <source>Cancel this session?</source>
@@ -443,15 +443,15 @@
     </message>
     <message>
         <source>Unable to create time data location.</source>
-        <translation>Não foi possível criar a localização dos dados do horário.</translation>
+        <translation>Não foi possível criar a pasta dos dados de horas.</translation>
     </message>
     <message>
         <source>Unable to move time data location.</source>
-        <translation>Não foi possível mover a localização dos dados do horário.</translation>
+        <translation>Não foi possível mover a pasta dos dados de horas.</translation>
     </message>
     <message>
         <source>A project with that name already exists.</source>
-        <translation>Um projeto com esse nome já existe.</translation>
+        <translation>Já existe um projeto com esse nome.</translation>
     </message>
     <message>
         <source>Remove selected project?</source>
@@ -467,58 +467,58 @@
     </message>
     <message>
         <source>Kapow Punch Clock</source>
-        <translation>Relógio de Ponto Kapow</translation>
+        <translation>Kapow – Relógio de ponto</translation>
     </message>
     <message>
         <source>&amp;Close to Tray</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Fechar para a barra de menus</translation>
     </message>
     <message>
         <source>Re&amp;move Report</source>
-        <translation type="unfinished"></translation>
+        <translation>Re&amp;mover relatório</translation>
     </message>
     <message>
         <source>&amp;Start Minimized</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Iniciar minimizado</translation>
     </message>
     <message>
         <source>Stop All</source>
-        <translation type="unfinished"></translation>
+        <translation>Parar todos</translation>
     </message>
     <message>
         <source>Stop all timers?</source>
-        <translation type="unfinished"></translation>
+        <translation>Parar todos os cronômetros?</translation>
     </message>
     <message>
         <source>&amp;Move To...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Mover para...</translation>
     </message>
     <message numerus="yes">
         <source>Remove selected session(s)?</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Remover a sessão selecionada?</numerusform>
+            <numerusform>Remover as sessões selecionadas?</numerusform>
+            <numerusform>Remover as sessões selecionadas?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <source>Move Session(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Mover sessão</numerusform>
+            <numerusform>Mover sessões</numerusform>
+            <numerusform>Mover sessões</numerusform>
         </translation>
     </message>
     <message>
         <source>Move</source>
-        <translation type="unfinished"></translation>
+        <translation>Mover</translation>
     </message>
     <message numerus="yes">
         <source>Could not move session(s) because of conflicts.</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Não foi possível mover a sessão porque ela se sobrepõe a outras.</numerusform>
+            <numerusform>Não foi possível mover as sessões porque elas se sobrepõem a outras.</numerusform>
+            <numerusform>Não foi possível mover as sessões porque elas se sobrepõem a outras.</numerusform>
         </translation>
     </message>
 </context>
@@ -526,27 +526,27 @@
     <name>main</name>
     <message>
         <source>Punch clock program</source>
-        <translation type="unfinished"></translation>
+        <translation>Programa de relógio de ponto</translation>
     </message>
     <message>
         <source>Store settings as INI format in specified file.</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar as configurações em formato INI no arquivo indicado.</translation>
     </message>
     <message>
         <source>file</source>
-        <translation type="unfinished"></translation>
+        <translation>arquivo</translation>
     </message>
     <message>
         <source>Do not create automatic backups of time data.</source>
-        <translation type="unfinished"></translation>
+        <translation>Não criar cópias de segurança automáticas dos dados de horas.</translation>
     </message>
     <message>
         <source>The time data file to use.</source>
-        <translation type="unfinished"></translation>
+        <translation>Arquivo de dados de horas a ser usado.</translation>
     </message>
     <message>
         <source>Start minimized in system tray.</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciar minimizado na barra de menus.</translation>
     </message>
 </context>
 </TS>
