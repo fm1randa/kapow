@@ -17,6 +17,16 @@ private Q_SLOTS:
 	void startTimeOfRunningTimer();
 	void startTimeAfterStop();
 	void startTimeAfterCancel();
+	void setStartTimeEarlierThenStop();
+	void setStartTimeWithoutRunningTimer();
+	void setStartTimeInFuture();
+	void setStartTimeBeforeLastSession();
+	void setStartTimeAtEndOfLastSession();
+	void setStartTimeLater();
+	void setStartTimeAcrossMidnight();
+	void setStartTimeWithoutSessions();
+	void setStartTimeKeepsMaximumDateTime();
+	void setStartTimeIsAutosaved();
 };
 
 #endif // KAPOW_TEST_PROJECT_H

@@ -45,6 +45,12 @@ public:
 		return m_data.value(pos);
 	}
 
+	// End of the latest session; invalid when there are no sessions
+	QDateTime lastStop() const
+	{
+		return !m_data.isEmpty() ? QDateTime(m_data.last().date(), m_data.last().stop()) : QDateTime();
+	}
+
 	void beginLoad();
 	void endLoad();
 

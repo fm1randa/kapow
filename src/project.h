@@ -24,6 +24,7 @@ public:
 
 	bool start(const QDateTime& current);
 	bool stop(QDateTime current = QDateTime());
+	bool setStartTime(const QDateTime& start, const QDateTime& current);
 	void updateTime(const QDateTime& current);
 	void setTask(const QString& task);
 

@@ -151,6 +151,26 @@ bool Project::stop(QDateTime current)
 
 //-----------------------------------------------------------------------------
 
+bool Project::setStartTime(const QDateTime& start, const QDateTime& current)
+{
+	// Only the running timer can move, never into the future nor before the last session
+	if (!m_active || (start > current)) {
+		return false;
+	}
+	const QDateTime last_stop = m_model->lastStop();
+	if (last_stop.isValid() && (start < last_stop)) {
+		return false;
+	}
+
+	m_start_time = start;
+	m_model->setMaximumDateTime(m_start_time);
+	updateTime(current);
+
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
 void Project::setTask(const QString& task)
 {
 	m_task = task;
