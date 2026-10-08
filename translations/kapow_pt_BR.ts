@@ -258,6 +258,10 @@
         <translation>00:00:00</translation>
     </message>
     <message>
+        <source>Running since %1, %2</source>
+        <translation>Rodando desde %1, %2</translation>
+    </message>
+    <message>
         <source>Start</source>
         <translation>Iniciar</translation>
     </message>

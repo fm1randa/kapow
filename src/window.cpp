@@ -35,6 +35,7 @@
 #include <QItemEditorFactory>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocale>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -76,6 +77,9 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	QFont font = m_display->font();
 	font.setPointSize(32);
 	m_display->setFont(font);
+
+	m_start_line = new QLabel(contents);
+	m_start_line->hide();
 
 	m_current_time = QDateTime::currentDateTime();
 	m_timer = new QTimer(this);
@@ -335,6 +339,7 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	session_layout->setContentsMargins(0, 0, 0, 0);
 	session_layout->setSpacing(0);
 	session_layout->addWidget(m_display, 0, Qt::AlignCenter);
+	session_layout->addWidget(m_start_line, 0, Qt::AlignCenter);
 	session_layout->addLayout(session_buttons);
 
 	QVBoxLayout* layout = new QVBoxLayout(contents);
@@ -1505,6 +1510,15 @@ void Window::updateDisplay()
 {
 	QString time = m_active_project->time();
 	m_display->setText(!time.isEmpty() ? time : "00:00:00");
+
+	const QDateTime start = m_active_project->startTime();
+	if (start.isValid()) {
+		const QLocale locale;
+		m_start_line->setText(tr("Running since %1, %2")
+				.arg(locale.toString(start.time(), QLocale::ShortFormat),
+					locale.toString(start.date(), QLocale::ShortFormat)));
+	}
+	m_start_line->setVisible(start.isValid());
 }
 
 //-----------------------------------------------------------------------------

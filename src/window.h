@@ -116,6 +116,7 @@ private:
 	QSplitter* m_contents;
 	QTreeWidget* m_projects;
 	QLabel* m_display;
+	QLabel* m_start_line;
 	QLineEdit* m_task;
 	QPushButton* m_start;
 	QPushButton* m_stop;
