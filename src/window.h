@@ -41,6 +41,7 @@ public Q_SLOTS:
 
 protected:
 	bool event(QEvent* event) override;
+	bool eventFilter(QObject* watched, QEvent* event) override;
 	void closeEvent(QCloseEvent* event) override;
 	void showEvent(QShowEvent* event) override;
 
@@ -76,6 +77,7 @@ private Q_SLOTS:
 	void sessionsScrolled(int value);
 	void addSession();
 	void editSession();
+	void editStartTime();
 	void removeSessions();
 	void moveSessions();
 	void toggleColumnHidden(int column);

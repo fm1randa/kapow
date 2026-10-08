@@ -18,6 +18,7 @@
 #include "session_dialog.h"
 #include "session_model.h"
 #include "settings.h"
+#include "start_time_dialog.h"
 #include "time_editor.h"
 
 #include <QAction>
@@ -40,6 +41,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaProperty>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QSaveFile>
 #include <QScrollBar>
@@ -79,6 +81,9 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	m_display->setFont(font);
 
 	m_start_line = new QLabel(contents);
+	m_start_line->setCursor(Qt::PointingHandCursor);
+	m_start_line->setToolTip(tr("Click to change the start time"));
+	m_start_line->installEventFilter(this);
 	m_start_line->hide();
 
 	m_current_time = QDateTime::currentDateTime();
@@ -430,6 +435,25 @@ bool Window::event(QEvent* event)
 		updateColumnWidths();
 	}
 	return QMainWindow::event(event);
+}
+
+//-----------------------------------------------------------------------------
+
+bool Window::eventFilter(QObject* watched, QEvent* event)
+{
+	// Treat a left click on the start line as a button press
+	if (watched == m_start_line) {
+		if (event->type() == QEvent::MouseButtonPress) {
+			return static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton;
+		} else if (event->type() == QEvent::MouseButtonRelease) {
+			const QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+			if ((mouse_event->button() == Qt::LeftButton) && m_start_line->rect().contains(mouse_event->position().toPoint())) {
+				editStartTime();
+				return true;
+			}
+		}
+	}
+	return QMainWindow::eventFilter(watched, event);
 }
 
 //-----------------------------------------------------------------------------
@@ -982,6 +1006,34 @@ void Window::editSession()
 		}
 	} else if (m_active_model->flags(index) & Qt::ItemIsEditable) {
 		m_details->edit(m_details->currentIndex());
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::editStartTime()
+{
+	Project* project = m_active_project;
+	if (!project || !project->startTime().isValid()) {
+		return;
+	}
+
+	StartTimeDialog dialog(this);
+	dialog.setStartTime(project->startTime());
+	Q_FOREVER {
+		if (dialog.exec() != QDialog::Accepted) {
+			break;
+		}
+
+		// Judge "now" at the moment of confirming, and count from that same moment
+		m_current_time = QDateTime::currentDateTime();
+		if (project->setStartTime(dialog.startTime(), m_current_time)) {
+			updateDetails();
+			save();
+			break;
+		} else {
+			QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
+		}
 	}
 }
 
