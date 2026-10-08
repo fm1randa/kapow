@@ -12,9 +12,11 @@
 class Project;
 class SessionDelegate;
 class SessionModel;
+class StartTimeEditor;
 
 #include <QDateTime>
 #include <QMainWindow>
+#include <QPointer>
 #include <QSystemTrayIcon>
 class QComboBox;
 class QLabel;
@@ -78,6 +80,8 @@ private Q_SLOTS:
 	void addSession();
 	void editSession();
 	void editStartTime();
+	void applyStartTimeEditor();
+	void closeStartTimeEditor();
 	void removeSessions();
 	void moveSessions();
 	void toggleColumnHidden(int column);
@@ -119,6 +123,8 @@ private:
 	QTreeWidget* m_projects;
 	QLabel* m_display;
 	QLabel* m_start_line;
+	StartTimeEditor* m_start_editor;
+	QPointer<Project> m_start_editor_project;
 	QLineEdit* m_task;
 	QPushButton* m_start;
 	QPushButton* m_stop;

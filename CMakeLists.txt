@@ -57,6 +57,7 @@ qt_add_executable(kapow
 	src/session_model.h
 	src/settings.h
 	src/start_time_dialog.h
+	src/start_time_editor.h
 	src/time_editor.h
 	src/window.h
 	# Sources
@@ -76,6 +77,7 @@ qt_add_executable(kapow
 	src/session_model.cpp
 	src/settings.cpp
 	src/start_time_dialog.cpp
+	src/start_time_editor.cpp
 	src/time_editor.cpp
 	src/window.cpp
 	# Resources

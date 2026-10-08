@@ -19,6 +19,7 @@
 #include "session_model.h"
 #include "settings.h"
 #include "start_time_dialog.h"
+#include "start_time_editor.h"
 #include "time_editor.h"
 
 #include <QAction>
@@ -85,6 +86,11 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	m_start_line->setToolTip(tr("Click to change the start time"));
 	m_start_line->installEventFilter(this);
 	m_start_line->hide();
+
+	m_start_editor = new StartTimeEditor(contents);
+	connect(m_start_editor, &StartTimeEditor::accepted, this, &Window::applyStartTimeEditor);
+	connect(m_start_editor, &StartTimeEditor::cancelled, this, &Window::closeStartTimeEditor);
+	m_start_editor->hide();
 
 	m_current_time = QDateTime::currentDateTime();
 	m_timer = new QTimer(this);
@@ -345,6 +351,7 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	session_layout->setSpacing(0);
 	session_layout->addWidget(m_display, 0, Qt::AlignCenter);
 	session_layout->addWidget(m_start_line, 0, Qt::AlignCenter);
+	session_layout->addWidget(m_start_editor, 0, Qt::AlignCenter);
 	session_layout->addLayout(session_buttons);
 
 	QVBoxLayout* layout = new QVBoxLayout(contents);
@@ -460,6 +467,8 @@ bool Window::eventFilter(QObject* watched, QEvent* event)
 
 void Window::closeEvent(QCloseEvent* event)
 {
+	closeStartTimeEditor();
+
 	Settings settings;
 	settings.setValue("WindowGeometry", saveGeometry());
 	settings.setValue("SplitterSizes", m_contents->saveState());
@@ -1018,6 +1027,15 @@ void Window::editStartTime()
 		return;
 	}
 
+	if (m_inline) {
+		m_start_editor_project = project;
+		m_start_editor->setStartTime(project->startTime());
+		m_start_line->hide();
+		m_start_editor->show();
+		m_start_editor->setFocus();
+		return;
+	}
+
 	StartTimeDialog dialog(this);
 	dialog.setStartTime(project->startTime());
 	Q_FOREVER {
@@ -1035,6 +1053,39 @@ void Window::editStartTime()
 			QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::applyStartTimeEditor()
+{
+	Project* project = m_start_editor_project;
+	if (!project) {
+		return;
+	}
+
+	// Judge "now" at the moment of confirming, and count from that same moment
+	m_current_time = QDateTime::currentDateTime();
+	if (project->setStartTime(m_start_editor->startTime(), m_current_time)) {
+		closeStartTimeEditor();
+		updateDetails();
+		save();
+	} else {
+		// The warning is another window, so the editor stays open for a retry
+		QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::closeStartTimeEditor()
+{
+	if (!m_start_editor_project) {
+		return;
+	}
+	m_start_editor_project = nullptr;
+	m_start_editor->hide();
+	updateDisplay();
 }
 
 //-----------------------------------------------------------------------------
@@ -1570,7 +1621,13 @@ void Window::updateDisplay()
 				.arg(locale.toString(start.time(), QLocale::ShortFormat),
 					locale.toString(start.date(), QLocale::ShortFormat)));
 	}
-	m_start_line->setVisible(start.isValid());
+
+	// Discard an open start time editor once its timer stops or another project is selected
+	if (m_start_editor_project && ((m_start_editor_project != m_active_project) || !start.isValid())) {
+		m_start_editor_project = nullptr;
+		m_start_editor->hide();
+	}
+	m_start_line->setVisible(start.isValid() && !m_start_editor_project);
 }
 
 //-----------------------------------------------------------------------------
