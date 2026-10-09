@@ -81,6 +81,27 @@ bool SessionModel::hasConflict(const QDateTime& current) const
 
 //-----------------------------------------------------------------------------
 
+bool SessionModel::canMoveStart(const QDateTime& start, const QDateTime& new_start, const QDateTime& current) const
+{
+	// A timer running since start may begin anywhere from the end of the session
+	// before it up to now, as long as it stays before the session after it
+	if (new_start > current) {
+		return false;
+	}
+	for (int pos = m_data.count(); pos > 0; --pos) {
+		const Session& session = m_data.at(pos - 1);
+		const QDateTime stop(session.date(), session.stop());
+		if (stop <= start) {
+			return new_start >= stop;
+		} else if (new_start >= QDateTime(session.date(), session.start())) {
+			return false;
+		}
+	}
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
 void SessionModel::beginLoad()
 {
 	m_loaded = false;

@@ -12,9 +12,12 @@
 class Project;
 class SessionDelegate;
 class SessionModel;
+class StartTimeDialog;
+class StartTimeEditor;
 
 #include <QDateTime>
 #include <QMainWindow>
+#include <QPointer>
 #include <QSystemTrayIcon>
 class QComboBox;
 class QLabel;
@@ -41,6 +44,7 @@ public Q_SLOTS:
 
 protected:
 	bool event(QEvent* event) override;
+	bool eventFilter(QObject* watched, QEvent* event) override;
 	void closeEvent(QCloseEvent* event) override;
 	void showEvent(QShowEvent* event) override;
 
@@ -76,6 +80,9 @@ private Q_SLOTS:
 	void sessionsScrolled(int value);
 	void addSession();
 	void editSession();
+	void editStartTime();
+	void applyStartTimeEditor();
+	void discardStartTimeEdit();
 	void removeSessions();
 	void moveSessions();
 	void toggleColumnHidden(int column);
@@ -93,6 +100,7 @@ private:
 	void removeProject(QTreeWidgetItem* item);
 	void minimizeToTray();
 	void restoreFromTray();
+	bool commitStartTime(Project* project, const QDateTime& start);
 	bool showRunningProject();
 	void updateColumnWidths();
 	void updateDetails();
@@ -116,6 +124,10 @@ private:
 	QSplitter* m_contents;
 	QTreeWidget* m_projects;
 	QLabel* m_display;
+	QLabel* m_start_line;
+	StartTimeEditor* m_start_editor;
+	QPointer<Project> m_start_editor_project;
+	QPointer<StartTimeDialog> m_start_dialog;
 	QLineEdit* m_task;
 	QPushButton* m_start;
 	QPushButton* m_stop;

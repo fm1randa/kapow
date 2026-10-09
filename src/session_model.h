@@ -40,6 +40,8 @@ public:
 
 	bool hasConflict(const QDateTime& current) const;
 
+	bool canMoveStart(const QDateTime& start, const QDateTime& new_start, const QDateTime& current) const;
+
 	Session session(int pos) const
 	{
 		return m_data.value(pos);

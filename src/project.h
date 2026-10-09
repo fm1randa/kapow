@@ -24,10 +24,17 @@ public:
 
 	bool start(const QDateTime& current);
 	bool stop(QDateTime current = QDateTime());
+	bool setStartTime(const QDateTime& start, const QDateTime& current);
 	void updateTime(const QDateTime& current);
 	void setTask(const QString& task);
 
 	bool isActive() const;
+
+	// Start time of this project's own running timer; invalid when it is not running
+	QDateTime startTime() const
+	{
+		return m_active ? m_start_time : QDateTime();
+	}
 
 	SessionModel* model() const
 	{

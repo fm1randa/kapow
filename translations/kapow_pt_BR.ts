@@ -252,10 +252,33 @@
     </message>
 </context>
 <context>
+    <name>StartTimeDialog</name>
+    <message>
+        <source>Change Start Time</source>
+        <translation>Mudar início</translation>
+    </message>
+    <message>
+        <source>Date:</source>
+        <translation>Data:</translation>
+    </message>
+    <message>
+        <source>Start:</source>
+        <translation>Início:</translation>
+    </message>
+</context>
+<context>
     <name>Window</name>
     <message>
         <source>00:00:00</source>
         <translation>00:00:00</translation>
+    </message>
+    <message>
+        <source>Running since %1, %2</source>
+        <translation>Rodando desde %1, %2</translation>
+    </message>
+    <message>
+        <source>Click to change the start time</source>
+        <translation>Clique para mudar o início</translation>
     </message>
     <message>
         <source>Start</source>

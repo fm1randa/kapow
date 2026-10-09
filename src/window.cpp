@@ -18,6 +18,8 @@
 #include "session_dialog.h"
 #include "session_model.h"
 #include "settings.h"
+#include "start_time_dialog.h"
+#include "start_time_editor.h"
 #include "time_editor.h"
 
 #include <QAction>
@@ -35,10 +37,12 @@
 #include <QItemEditorFactory>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocale>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QMetaProperty>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QSaveFile>
 #include <QScrollBar>
@@ -76,6 +80,17 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	QFont font = m_display->font();
 	font.setPointSize(32);
 	m_display->setFont(font);
+
+	m_start_line = new QLabel(contents);
+	m_start_line->setCursor(Qt::PointingHandCursor);
+	m_start_line->setToolTip(tr("Click to change the start time"));
+	m_start_line->installEventFilter(this);
+	m_start_line->hide();
+
+	m_start_editor = new StartTimeEditor(contents);
+	connect(m_start_editor, &StartTimeEditor::accepted, this, &Window::applyStartTimeEditor);
+	connect(m_start_editor, &StartTimeEditor::cancelled, this, &Window::discardStartTimeEdit);
+	m_start_editor->hide();
 
 	m_current_time = QDateTime::currentDateTime();
 	m_timer = new QTimer(this);
@@ -335,6 +350,8 @@ Window::Window(const QString& filename, bool backups_enabled, bool start_minimiz
 	session_layout->setContentsMargins(0, 0, 0, 0);
 	session_layout->setSpacing(0);
 	session_layout->addWidget(m_display, 0, Qt::AlignCenter);
+	session_layout->addWidget(m_start_line, 0, Qt::AlignCenter);
+	session_layout->addWidget(m_start_editor, 0, Qt::AlignCenter);
 	session_layout->addLayout(session_buttons);
 
 	QVBoxLayout* layout = new QVBoxLayout(contents);
@@ -429,8 +446,29 @@ bool Window::event(QEvent* event)
 
 //-----------------------------------------------------------------------------
 
+bool Window::eventFilter(QObject* watched, QEvent* event)
+{
+	// Treat a left click on the start line as a button press
+	if (watched == m_start_line) {
+		if (event->type() == QEvent::MouseButtonPress) {
+			return static_cast<QMouseEvent*>(event)->button() == Qt::LeftButton;
+		} else if (event->type() == QEvent::MouseButtonRelease) {
+			const QMouseEvent* mouse_event = static_cast<QMouseEvent*>(event);
+			if ((mouse_event->button() == Qt::LeftButton) && m_start_line->rect().contains(mouse_event->position().toPoint())) {
+				editStartTime();
+				return true;
+			}
+		}
+	}
+	return QMainWindow::eventFilter(watched, event);
+}
+
+//-----------------------------------------------------------------------------
+
 void Window::closeEvent(QCloseEvent* event)
 {
+	discardStartTimeEdit();
+
 	Settings settings;
 	settings.setValue("WindowGeometry", saveGeometry());
 	settings.setValue("SplitterSizes", m_contents->saveState());
@@ -528,6 +566,7 @@ void Window::setDecimalTotals(bool decimals)
 void Window::setInlineEditing(bool edit)
 {
 	m_inline = edit;
+	discardStartTimeEdit();
 	if (!edit) {
 		m_details->closePersistentEditor(m_details->currentIndex());
 	}
@@ -587,6 +626,7 @@ void Window::start()
 
 void Window::stop()
 {
+	discardStartTimeEdit();
 	if (!m_active_project->stop(m_current_time)) {
 		QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
 	}
@@ -626,6 +666,7 @@ void Window::stopAll()
 		show();
 	}
 	if (QMessageBox::question(this, tr("Question"), tr("Stop all timers?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+		discardStartTimeEdit();
 		for (Project* project : std::as_const(m_active_timers)) {
 			project->stop(m_current_time);
 		}
@@ -654,6 +695,7 @@ void Window::stopAll()
 void Window::cancel()
 {
 	if (QMessageBox::question(this, tr("Question"), tr("Cancel this session?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) == QMessageBox::Yes) {
+		discardStartTimeEdit();
 		m_active_project->stop();
 		m_active_timers.removeAll(m_active_project);
 		m_remove_project->setEnabled(true);
@@ -819,6 +861,8 @@ void Window::projectActivated(QTreeWidgetItem* item)
 		return;
 	}
 
+	discardStartTimeEdit();
+
 	if (m_active_model) {
 		disconnect(m_active_model, &SessionModel::billedStatusChanged, this, &Window::modelBilledStatusChanged);
 		disconnect(m_active_model, &SessionModel::rowsInserted, this, &Window::sessionsInserted);
@@ -978,6 +1022,83 @@ void Window::editSession()
 	} else if (m_active_model->flags(index) & Qt::ItemIsEditable) {
 		m_details->edit(m_details->currentIndex());
 	}
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::editStartTime()
+{
+	Project* project = m_active_project;
+	if (!project || !project->startTime().isValid()) {
+		return;
+	}
+
+	if (m_inline) {
+		m_start_editor_project = project;
+		m_start_editor->setStartTime(project->startTime());
+		m_start_line->hide();
+		m_start_editor->show();
+		m_start_editor->setFocus();
+		return;
+	}
+
+	StartTimeDialog dialog(this);
+	dialog.setStartTime(project->startTime());
+	m_start_dialog = &dialog;
+
+	// Stopping the timer meanwhile rejects the dialog, or ends the retries after a warning
+	while (project->startTime().isValid() && (dialog.exec() == QDialog::Accepted)) {
+		if (commitStartTime(project, dialog.startTime())) {
+			break;
+		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::applyStartTimeEditor()
+{
+	Project* project = m_start_editor_project;
+	if (!project) {
+		return;
+	}
+
+	// The warning is another window, so the editor stays open for a retry
+	if (commitStartTime(project, m_start_editor->startTime())) {
+		discardStartTimeEdit();
+	}
+}
+
+//-----------------------------------------------------------------------------
+
+bool Window::commitStartTime(Project* project, const QDateTime& start)
+{
+	// Judge "now" at the moment of confirming, and count from that same moment
+	m_current_time = QDateTime::currentDateTime();
+	if (!project->setStartTime(start, m_current_time)) {
+		QMessageBox::warning(this, tr("Error"), tr("Session conflicts with other sessions."));
+		return false;
+	}
+
+	updateDetails();
+	save();
+	return true;
+}
+
+//-----------------------------------------------------------------------------
+
+void Window::discardStartTimeEdit()
+{
+	// Close the start time dialog or the inline editor without applying it
+	if (m_start_dialog) {
+		m_start_dialog->reject();
+	}
+	if (!m_start_editor_project) {
+		return;
+	}
+	m_start_editor_project = nullptr;
+	m_start_editor->hide();
+	updateDisplay();
 }
 
 //-----------------------------------------------------------------------------
@@ -1505,6 +1626,15 @@ void Window::updateDisplay()
 {
 	QString time = m_active_project->time();
 	m_display->setText(!time.isEmpty() ? time : "00:00:00");
+
+	const QDateTime start = m_active_project->startTime();
+	if (start.isValid()) {
+		const QLocale locale;
+		m_start_line->setText(tr("Running since %1, %2")
+				.arg(locale.toString(start.time(), QLocale::ShortFormat),
+					locale.toString(start.date(), QLocale::ShortFormat)));
+	}
+	m_start_line->setVisible(start.isValid() && !m_start_editor_project);
 }
 
 //-----------------------------------------------------------------------------
